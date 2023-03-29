@@ -12,10 +12,13 @@ document.addEventListener('click', function(e){
         handleReplyClick(e.target.dataset.reply)
     }
     else if(e.target.id === 'tweet-btn'){
-        handleTweetBtnClick()
++        handleTweetBtnClick()
     }
     else if(e.target.dataset.delete){
         handleDeleteClick(e.target.dataset.delete)
+    }
+     else if(e.target.id === 'reply-btn'){
+        handleNewReplyBtnClick()
     }
 })
  
@@ -75,9 +78,34 @@ function handleTweetBtnClick(){
 }
 
 function handleDeleteClick(tweetId){
-    console.log("delete")
-    console.log(tweetId)
+    const index = tweetsData.findIndex((tweet) => tweet.uuid === tweetId);
+    if (index !== -1) {
+      tweetsData.splice(index, 1);
+    }
+
+    render()
 }
+
+function handleNewReplyBtnClick(tweet){
+    const replyInput = document.getElementById('reply-input').value
+    console.log(replyInput)
+
+    if(replyInput){
+        tweetsData.unshift({
+            handle: `@Scrimba`,
+            profilePic: `images/scrimbalogo.png`,
+            likes: 0,
+            retweets: 0,
+            tweetText: replyInput,
+            replies: [],
+            isLiked: false,
+            isRetweeted: false,
+            uuid: uuidv4()
+        })
+render()
+}
+}
+
 
 function getFeedHtml(){
     let feedHtml = ``
@@ -104,8 +132,20 @@ function getFeedHtml(){
         }
         
         let repliesHtml = ''
-        
-        if(tweet.replies.length > 0){
+        if(tweet.replies.length === 0){
+            repliesHtml += `
+            <div class="tweet-input-area tweet-reply">
+			<textarea placeholder="Enter your reply" id="reply-input"></textarea>
+		</div>
+		<button class="reply-btn" id="reply-btn" data-newReply="${tweet.uuid}">Reply</button>
+            `
+        }
+             if(tweet.replies.length > 0){
+            repliesHtml +=`
+            <div class="tweet-input-area tweet-reply">
+			<textarea placeholder="Enter your reply" id="tweet-input"></textarea>
+		</div>
+		<button class="reply-btn" id="reply-btn" data-newReply="${tweet.uuid}">Reply</button>`
             tweet.replies.forEach(function(reply){
                 repliesHtml+=`
 <div class="tweet-reply">
